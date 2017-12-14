@@ -3,6 +3,8 @@
 
 2. 调用SQLiteOpenHelper的getReadableDatabase()和getWritableDatabase()可以得到可读和可写的数据库，然后可以进行操作。
 
+WCDB加密的数据库是在调用helper的super方法时传入密码。
+
 --
 ###建立索引的语句：
 
@@ -16,6 +18,9 @@
 ###编译SQL语句
 
 对于需要重复执行很多次的SQL语句，可以编译成SQLiteStatement语句。
+
+ * 编译sql语句获得SQLiteStatement对象，参数使用?代替
+ * 在循环中对SQLiteStatement对象进行具体数据绑定，bind方法中的index从1开始，不是0
 
 --
 ###使用事务
