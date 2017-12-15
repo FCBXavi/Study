@@ -34,3 +34,7 @@ onInterceptTouchEvent一旦返回一次true，就再也不会再被调用了
 ###和onTouch和onClick
 onTouch()的执行高于onClick()
 onTouch()返回true，会让View的dispatchTouchEvent方法直接返回true，不会调用onTouchEvent()，onClick也不会执行，onTouch如果返回false，就会在dispatchTouchEvent中执行onTouchEvent，如果注册了OnClickListener，就会在onTouchEvent中调用performClick，在里面回调onClick
+
+
+参考资料	
+[Android事件分发机制详解：史上最全面、最易懂](http://blog.csdn.net/carson_ho/article/details/54136311)
