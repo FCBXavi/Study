@@ -45,3 +45,8 @@ measure过程：
 4. 绘制子View;
 5. 如果需要，绘制fading edges，恢复layer;
 6. 绘制滚动条
+
+
+
+
+invalidate重新绘制，只能在主线程调用，postInvalidate可以在子线程调用，当View的大小形状或者位置发生改变时，调用requestLayout。
