@@ -48,11 +48,11 @@ BackgroundPoster和AsyncPoster实现Runnable，与HanlderPoster类似，不过�
 调用register方法注册时
 
 1. 首先会查找传入的Object，再SubscriberMethodFinder类中运用反射先获取到Object的所有方法，然后找以onEvent开头的方法，再跳过那些不是public，是static或者abstract的方法，再判断是不是只有一个参数的方法，再看onEvent后面有没有其他字符，后面可以有MainThread、BackgroundThread、Async修饰符，找出这些方法后，放在一个list中，然后以class的名字为key，list为value放在一个map中，方便同一个Object注册后能直接从map中取出对象。
-2. 在EventBus类中，有一个Map<Class<?>, CopyOnWriteArrayList<Subscription>> subscriptionsByEventType对象，找出所有的onEvent方法后，对这些方法遍历，以方法参数的类型为key，在subscriptionsByEventType中找到所有这个参数的订阅者，把当前这个方法按照优先级生成Subscription放入CopyOnWriteArrayList中。并且以subscriber为key，所有订阅的eventType集合为value，也放入一个map中(Map<Object, List<Class<?>>> typesBySubscriber typesBySubscriber)
+2. 在EventBus类中，有一个Map\<Class<?>, CopyOnWriteArrayList\<Subscription>> subscriptionsByEventType对象，找出所有的onEvent方法后，对这些方法遍历，以方法参数的类型为key，在subscriptionsByEventType中找到所有这个参数的订阅者，把当前这个方法按照优先级生成Subscription放入CopyOnWriteArrayList中。并且以subscriber为key，所有订阅的eventType集合为value，也放入一个map中(Map\<Object, List\<Class<?>>> typesBySubscriber)
 
 
 调用post方法
-EventBus中又一个ThreadLocal对象，存储PostingThreadState对象，post方法中获取到这个对象，这个对象封装了一次事件发送过程中所需数据，在其中有一个list存储了所有post方法传入的参数，在这里进行循环，每次取出一个参数，在subscriptionsByEventType中找到订阅它的方法，执行该方法。
+EventBus中有一个ThreadLocal对象，存储PostingThreadState对象，post方法中获取到这个对象，这个对象封装了一次事件发送过程中所需数据，在其中有一个list存储了所有post方法传入的参数，在这里进行循环，每次取出一个参数，在subscriptionsByEventType中找到订阅它的方法，执行该方法。
 
 
 unregister方法
