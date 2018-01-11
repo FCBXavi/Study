@@ -1,11 +1,14 @@
 Activity和自定义View保存状态
 在Activity被回收之前，系统会调用onSaveInstanceState(Bundle outState)来保存View的状态，并到传入的outState对象中。
+
 #####1.保存Window
 在Activity被回收时，会触发一个SaveState的事件。
 跟其他的事件一样，SaveState事件从Activity->Window->View传递到最大的View，然后遍历View树保存状态
 状态保存在一个SparseArray中，以View的ID作为key。
 自定义View可以重载onSaveInstanceState()来保存自己的状态，参考TextView的实现方法。
+
 ####2.保存Fragment
+
 ####3.调用外部注册的回调方法
 <pre>
 protected void onSaveInstanceState(Bundle outState) {
@@ -17,6 +20,7 @@ protected void onSaveInstanceState(Bundle outState) {
     getApplication().dispatchActivitySaveInstanceState(this, outState);
 }
 </pre>
+
 
 onRestoreInstanceState方法
 在Activity被重新创建时，会通过onCreate(Bundle savedInstanceState)和onRestoreInstanceState(Bundle savedInstanceState)传入保存的状态信息并恢复View的状态。
