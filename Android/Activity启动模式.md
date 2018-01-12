@@ -11,7 +11,7 @@
 	首先会根据taskAffinity去寻找当前是否存在一个对应名字的任务栈，如果不存在，则会创建一个新的Task，并创建新的Activity实例入栈到新创建的Task中去，如果存在，则得到该任务栈，查找该任务栈中是否存在该Activity实例，如果存在实例，则将它上面的Activity实例都出栈，然后回调启动的Activity实例的onNewIntent方法，如果不存在该实例，则新建Activity，并入栈。
  注：尽管Activity在新task中启动，但按返回按钮还是会返回上一个Activity
 4. singleInstance
-	只有一个实例，单独有一个栈保存其实例，栈中有且只有这一个Activity。SingleInstance模式启动的Activity在系统中具有全局唯一性。
+	只有一个实例，单独有一个栈保存其实例，栈中有且只有这一个Activity。SingleInstance模式启动的Activity在系统中具有全局唯一性。SingleInstance Activity启动其他Activity时，会在intent中加上FLAG\_ACTIVITY\_NEW\_TASK标志
  
  
 可在intent中通过setFlag设置即将启动的Activity的模式，优先级高于AndroidManifest.xml文件中定义的启动模式。

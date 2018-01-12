@@ -18,8 +18,8 @@ if(activity == null || activity.isFinishing || activity.isDestroyed) {
 	如何让系统资源配置发生改变时不重新创建Activity？     
 	在AndroidManifest文件中activity节点下增加android:configChanges设置某些属性发生变化时activity不重建。在onConfigurationChanged(Configuration newConfig)方法中可以接收到configChange发生变化的情况。
 	
-2. 内存不足导致Activity被杀死		       	
-activity优先级：      
+2. 内存不足导致Activity被杀死           
+ activity优先级：      
  a. 前台Activity——正在和用户交互的Activity，优先级最高     
  b. 可见但非前台Activity——比如Activity中弹出了一个对话框，导致Activity可见但是位于后台无法与用户直接交互。      
  c. 后台Activity——已经被暂停的Activity，比如执行了onStop，优先级最低。       
