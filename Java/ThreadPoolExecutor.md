@@ -22,4 +22,12 @@
 1. 调用ThreadPoolExecutor的execute提交线程，首先检查CorePool，如果CorePool内的线程小于CorePoolSize，新创建线程执行任务。
 2. 如果当前CorePool内的线程大于等于CorePoolSize，那么将线程加入到BlockingQueue。
 3. 如果不能加入BlockingQueue，在小于MaxPoolSize的情况下创建线程执行任务。
-4. 如果线程数大于等于MaxPoolSize，那么执行拒绝策略。
+4. 如果线程数大于等于MaxPoolSize，那么执行拒绝策略。       
+
+
+
+一半来说 BlockingQueue有三种选择				
+	
+	ArrayBlockingQueue;//固定大小的队列
+	LinkedBlockingQueue;//大小是Integer.MAX_VALUE
+	SynchronousQueue;//它不会保存提交的任务，而是将直接新建一个线程来执行新来的任务。
