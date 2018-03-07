@@ -22,3 +22,6 @@ IntentService 处理异步请求
 因此我们通过复写方法onHandleIntent()，再在里面根据Intent的不同进行不同的线程操作就可以了    
 多次调用startService(Intent intent)方法(也就是多次调用onStartCommand方法)时,会将消息加入到消息队列中执行，因此事件是按照顺序执行的    
 与后台线程相比，IntentService是一种后台服务，优势是：优先级高（不容易被系统杀死），从而保证任务的执行
+
+
+[ Android中的Service：Binder，Messenger，AIDL](http://blog.csdn.net/luoyanglizi/article/details/51594016)
