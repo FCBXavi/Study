@@ -20,20 +20,27 @@ onReceive方法运行在主线程，所以不能进行耗时操作
 Intent intent = new Intent();
 //对应BroadcastReceiver中intentFilter的action
 intent.setAction(BROADCAST_ACTION);
-</pre>
-//发送广播
-sendBroadcast(intent);
+
+发送广播
+sendBroadcast(intent);   
+</pre>             
+
 ######2.系统广播（System Broadcast）系统自动发送
-######3.有序广播（Ordered Broadcast）发送出去的广播被广播接受者按照先后顺序接收 有序是针对广播接收者而言的
+  
+######3.有序广播（Ordered Broadcast）
+
+发送出去的广播被广播接受者按照先后顺序接收 有序是针对广播接收者而言的
 优先级通过IntentFilter指定，数值越大，优先级越高
-<intent-filter android:priority="998">  
-  <action android:name="android.intent.action.MY_BROADCAST"/>  
-    <category android:name="android.intent.category.DEFAULT" />    </intent-filter>
+<pre>
+	\<intent-filter android:priority="998">  
+  	\<action android:name="android.intent.action.MY_BROADCAST"/>  
+    \<category android:name="android.intent.category.DEFAULT" />    </intent-filter>
+</pre>
 有序广播的使用过程与普通广播非常类似，差异仅在于广播的发送方式：
 sendOrderedBroadcast(Intent intent, String permission);
 如果为null则表示不要求接收者声明指定的权限，如果不为null，则表示接收者若要接收此广播，需声明指定权限。
 可以在优先级高的Receiver中调用abortBroadcast()终止传递
-######4.粘性广播（Sticky Broadcast）
+######4.粘性广播（Sticky Broadcast）          
 在Android5.0 & API 21中已经失效
 ######5.App应用内广播（Local Broadcast）
 * 具体使用1 - 将全局广播设置成局部广播
@@ -63,4 +70,7 @@ intent.setAction(BROADCAST_ACTION);
 localBroadcastManager.sendBroadcast(intent);
 </pre>
 
+
+
+onReceive方法运行在主线程，不能执行耗时操作，onReceive方法耗时超过10秒钟，可能会被系统杀死。
 
