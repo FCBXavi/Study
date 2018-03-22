@@ -166,3 +166,134 @@ AsyncCall
       		}
     	}
     }
+    
+看到AsyncCall在执行完网络请求后会在finally代码块中执行client.dispatcher().finished(this) 看一下这段代码           
+
+	 void finished(AsyncCall call) {
+    	finished(runningAsyncCalls, call, true);
+    }
+    //调用了以下方法
+    private <T> void finished(Deque<T> calls, T call, boolean promoteCalls) {
+    	int runningCallsCount;
+    	Runnable idleCallback;
+    	synchronized (this) {
+    		//如果这个Call不在正在执行的Call队列中，抛出异常，否则从队列中移除这个Call，然后执行promoteCalls()方法，promoteCalls()方法在下面
+      		if (!calls.remove(call)) throw new AssertionError("Call wasn't in-flight!");
+      		if (promoteCalls) promoteCalls();
+      		runningCallsCount = runningCallsCount();
+      		idleCallback = this.idleCallback;
+    	}
+		//当dispatcher空闲，即执行请求队列为空时执行的回调，可以在代码中设置这个回调
+    	if (runningCallsCount == 0 && idleCallback != null) {
+      			idleCallback.run();
+    		}
+    }
+    
+    //这个方法遍历等待队列，如果满足同一主机的请求小于maxRequestPerHost时，从队列中取出请求，放入线程池执行
+    private void promoteCalls() {
+    	if (runningAsyncCalls.size() >= maxRequests) return; // Already running max capacity.
+    	if (readyAsyncCalls.isEmpty()) return; // No ready calls to promote.
+
+    	for (Iterator<AsyncCall> i = readyAsyncCalls.iterator(); i.hasNext(); ) {
+      		AsyncCall call = i.next();
+
+      		if (runningCallsForHost(call) < maxRequestsPerHost) {
+        		i.remove();
+        		runningAsyncCalls.add(call);
+        		executorService().execute(call);
+      		}
+
+      		if (runningAsyncCalls.size() >= maxRequests) return; // Reached max capacity.
+    	}
+    }
+    
+    
+
+进行网络请求是通过getResponseWithInterceptorChain()这个方法获取返回值
+
+	Response getResponseWithInterceptorChain() throws IOException {
+    	// Build a full stack of interceptors.
+    	List<Interceptor> interceptors = new ArrayList<>();
+    	interceptors.addAll(client.interceptors());
+    	interceptors.add(retryAndFollowUpInterceptor);
+    	interceptors.add(new BridgeInterceptor(client.cookieJar()));
+    	interceptors.add(new CacheInterceptor(client.internalCache()));
+    	interceptors.add(new ConnectInterceptor(client));
+    	if (!forWebSocket) {
+      		interceptors.addAll(client.networkInterceptors());
+    	}
+    	interceptors.add(new CallServerInterceptor(forWebSocket));
+
+    	Interceptor.Chain chain = new RealInterceptorChain(
+        	interceptors, null, null, null, 0, originalRequest);
+    	return chain.proceed(originalRequest);
+    }
+    
+ 这里增加了很多拦截器            
+1. 在配置 OkHttpClient 时设置的 interceptors；         
+2. 负责失败重试以及重定向的 RetryAndFollowUpInterceptor；          
+3. 负责把用户构造的请求转换为发送到服务器的请求、把服务器返回的响应转换为用户友好的响应的BridgeInterceptor； 				
+4. 负责读取缓存直接返回、更新缓存的 CacheInterceptor；        
+5. 负责和服务器建立连接的 ConnectInterceptor；             
+6. 配置 OkHttpClient 时设置的 networkInterceptors；              
+7. 负责向服务器发送请求数据、从服务器读取响应数据的 CallServerInterceptor。      
+OkHttp的这种拦截器链采用的是责任链模式，这样的好处是将请求的发送和处理分开，并且可以动态添加中间的处理方实现对请求的处理、短路等操作。            
+不管有多少拦截器，最后都会走  
+
+	Interceptor.Chain chain = new RealInterceptorChain(
+        	interceptors, null, null, null, 0, originalRequest);
+    	return chain.proceed(originalRequest);
+    	
+我们看一下RealInterceptorChain这个类           
+	
+	public final class RealInterceptorChain implements Interceptor.Chain {
+		public RealInterceptorChain(List<Interceptor> interceptors, StreamAllocation streamAllocation,
+        	HttpCodec httpCodec, RealConnection connection, int index, Request request) {
+        	this.interceptors = interceptors;
+        	this.connection = connection;
+        	this.streamAllocation = streamAllocation;
+        	this.httpCodec = httpCodec;
+        	this.index = index;
+        	this.request = request;
+        }
+        	......
+        @Override 
+        public Response proceed(Request request) throws IOException {
+       		return proceed(request, streamAllocation, httpCodec, connection);
+    	}
+    	public Response proceed(Request request, StreamAllocation streamAllocation, HttpCodec httpCodec, RealConnection connection) throws IOException {
+    		if (index >= interceptors.size()) throw new AssertionError();
+
+    			calls++;
+
+    			......
+
+    		// Call the next interceptor in the chain.
+    		RealInterceptorChain next = new RealInterceptorChain(
+        		interceptors, streamAllocation, httpCodec, connection, index + 1, request);
+    		//获取到当前拦截器，调用其intercept方法
+    		Interceptor interceptor = interceptors.get(index);
+    		Response response = interceptor.intercept(next);
+    			......
+
+    			return response;
+    	}
+    	protected abstract void execute();
+    }
+    
+Interceptor代码如下
+
+	public interface Interceptor {
+		Response intercept(Chain chain) throws IOException;
+			nterface Chain {
+    			Request request();
+    		Response proceed(Request request) throws IOException;
+
+    		/**
+     		* Returns the connection the request will be executed on. This is only available in the chains
+     		* of network interceptors; for application interceptors this is always null.
+     		*/
+    		@Nullable Connection connection();
+    	}
+    }
+   
