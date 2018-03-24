@@ -9,6 +9,14 @@ if(activity == null || activity.isFinishing || activity.isDestroyed) {
 }
 </pre>
 
+ActivityA启动ActivityB生命周期流程
+A:onPause       
+B:onCreate->onStart->onResume
+A:onStop
+按下返回键
+B:onPause
+A:onRestart->onStart->onResume
+B:onStop->onDestroy
 
 * 异常情况下的生命周期
 
