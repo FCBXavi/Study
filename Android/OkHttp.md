@@ -36,7 +36,8 @@ Request
 Response       
 对请求的恢复，包含状态码，Http头和主体部分。      
 	
-	public final class Response implements Closeable {		final Request request;
+	public final class Response implements Closeable {
+		final Request request;
 		final Protocol protocol;
 		final int code;
 		final String message;
