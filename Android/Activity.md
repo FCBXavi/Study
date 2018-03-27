@@ -32,6 +32,13 @@ B:onStop->onDestroy
  b. 可见但非前台Activity——比如Activity中弹出了一个对话框，导致Activity可见但是位于后台无法与用户直接交互。      
  c. 后台Activity——已经被暂停的Activity，比如执行了onStop，优先级最低。       
  
- activity数据存储和恢复过程与上述一样
+ activity数据存储和恢复过程与上述一样         
+ 
+ 
+ 
+ View的生命周期     
+ -----------------------------    
+ onFinishInflate(Activity的OnCreate之后)->(Activity的onResume之后)onAttachedToWindow->onMeasure->onSizeChanged->onLayout->onDraw->(Activity的onDestroy之后)onDetachToWindow
+ 
 
 	

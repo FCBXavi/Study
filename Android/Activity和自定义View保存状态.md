@@ -1,5 +1,15 @@
 Activity和自定义View保存状态
-在Activity被回收之前，系统会调用onSaveInstanceState(Bundle outState)来保存View的状态，并到传入的outState对象中。     
+在Activity被回收之前，系统会调用onSaveInstanceState(Bundle outState)来保存View的状态，并到传入的outState对象中。          
+onSaveInstanceState调用时机：      
+
+* 当用户按下HOME键时。 
+* 从最近应用中选择运行其他的程序时。       
+* 按下电源按键（关闭屏幕显示）时。       
+* 从当前activity启动一个新的activity时。       
+* 屏幕方向切换时(无论竖屏切横屏还是横屏切竖屏都会调用)。 
+
+onRestoreInstanceState只有在activity确实是被系统回收，重新创建activity的情况下才会被调用，因此他俩并不一定是成对出现的。     
+    
 
 1.保存Window
 --------------------------------
