@@ -3,21 +3,30 @@ Activity生命周期中的7个方法，四大状态（可见、可见不可操�
 
 onCreat() -> onStart() -> [可见不可操作] -> onResume() -> [可操作] -> onPause() -> [可见不可操作] -> onStop() -> [不可见] -> onDestroy() -> [销毁]
 如何判断activity是否被销毁
-<pre>
-if(activity == null || activity.isFinishing || activity.isDestroyed) {
-    return;
-}
-</pre>
 
-ActivityA启动ActivityB生命周期流程
-A:onPause       
-B:onCreate->onStart->onResume
-A:onStop
-按下返回键
-B:onPause
-A:onRestart->onStart->onResume
-B:onStop->onDestroy
+	if(activity == null || activity.isFinishing || activity.isDestroyed) {
+    	return;
+	}
 
+
+正常情况下ActivityA启动ActivityB生命周期流程         
+A:onPause         
+B:onCreate->onStart->onResume         
+A:onStop        
+按下返回键       
+B:onPause       
+A:onRestart->onStart->onResume       
+B:onStop->onDestroy    
+
+A的launchMode为SingleTop且A在栈顶打开A时      
+onPause->onNewIntent->onResume           
+
+A的launchMode为SingleTask且栈中已有一个A的实例，从B打开A时     
+B:onPause       
+A:onNewIntent->onRestart->onStart->onResume      
+B:onStop->onDestroy      
+  
+ 
 * 异常情况下的生命周期
 
 1. 资源相关的系统配置发生改变导致Activity被杀死重建     
