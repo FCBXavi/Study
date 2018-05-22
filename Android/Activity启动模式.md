@@ -26,7 +26,6 @@ Activity启动模式
 
 
 
-
 android : taskAffinity属性   
 -------------------------------------
  standard和singleTop启动模式都是在原任务栈中新建Activity实例，不会启动新的Task，即使你指定了taskAffinity属性。
