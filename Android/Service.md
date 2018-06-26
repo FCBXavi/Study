@@ -10,7 +10,7 @@ Service运行在**主线程**，不可以进行耗时操作，处理耗时操作
 
 IntentService 处理异步请求
 实现步骤：  
-步骤1：定义IntentService的子类：传入线程名称、复写onHandleIntent()方法  
+步骤1：定义IntentService的子类：传入线程名称、复写onHandleIntent()方法    
 步骤2：在Manifest.xml中注册服务   
 步骤3：在Activity中开启Service服务   
 
