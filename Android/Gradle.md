@@ -30,6 +30,114 @@ Gradle中两个关键的概念：项目和任务
 	}
    
    
+根目录的build.gradle
+------------------------------
+
+	// 定义gradle脚本执行所需依赖
+	buildscript {
+		// 定义仓库，代表依赖包的来源
+		repositories {
+			jcenter()
+		}
+		dependencies {
+			classpath 'com.android.tools.build:gradle:1.2.3'
+		}
+	}
+	// 所有项目需要的依赖
+	allprojects {
+     	repositories {
+          jcenter() 
+     	}
+	}
+	
+	
+模块内的build.gradle	      
+---------------------------
+	
+	// 表示是Android应用插件，提供Android应用和依赖库的构建、打包和测试
+	apply plugin: 'com.android.application'
+	android {
+       compileSdkVersion 22
+       buildToolsVersion "22.0.1"
+       // app核心属性，会重写AndroidManifest.xml中的对应属性
+       defaultConfig {
+       	applicationId "com.gradleforandroid.gettingstarted"
+         	minSdkVersion 14
+         	targetSdkVersion 22
+         	// 版本号标识
+         	versionCode 1
+         	versionName "1.0"
+         	}
+      	// 如何构建不同版本的app
+      	buildTypes {
+      		release {
+          	minifyEnabled false
+            	proguardFiles getDefaultProguardFile
+                ('proguard-android.txt'), 'proguard-rules.pro'
+            	}
+      	} 
+	}
+	// gradle默认属性
+	dependencies {
+     	compile fileTree(dir: 'libs', include: ['*.jar'])
+     	compile 'com.android.support:appcompat-v7:22.2.0'
+     	}
+     	
+   
+tasks
+----------------
+android插件依赖于Java插件，Java插件依赖于base插件             
+base插件定义了assemble和clean任务，Java插件定义了check和build任务        
+
+assemble：集合所有的output         
+clean：清除所有的output        
+check：执行所有的checks检查，通常是unit测试和instrumentation测试         
+build：执行所欲哦的assemble和check             
+
+Android插件继承了这些基本的tasks，并实现了自己的行为       
+assemble：针对每个版本创建一个apk         
+clean：删除所有的构建任务，包括apk文件          
+check：执行Lint检查，检测到错误后停止执行脚本       
+build：执行assmeble和check      
+
+  
+全局设置
+-------------------
+在根目录的gradle文件中
+       
+	ext {
+		compileSdkVersion = 22
+		buildToolsVersion = "22.0.1"
+	}
+	
+在子模块的gradle文件中 
+
+	android {
+     	compileSdkVersion rootProject.ext.compileSdkVersion
+     	buildToolsVersion rootProject.ext.buildToolsVersion
+    }
+  
+
+仓库
+-------------------
+Gradle支持三种不同的仓库，分别是：Maven和Ivy以及文件夹。依赖包会在你执行build构建的时候从这些远程仓库下载，当然Gradle会为你在本地保留缓存，所以一个特定版本的依赖包只需要下载一次。        
+
+声明依赖，一个依赖有三个元素，group，name和version
+
+	dependencies {
+       compile 'com.google.code.gson:gson:2.3'
+       compile 'com.squareup.retrofit:retrofit:1.9.0'
+	}
+	
+上述的代码是基于groovy语法的，其完整表述是：
+
+	dependencies {
+      compile group: 'com.google.code.gson', name: 'gson', version:'2.3'
+      compile group: 'com.squareup.retrofit', name: 'retrofit'
+           version: '1.9.0'
+     }
+
+  
    
 [十分钟理解Gradle](https://www.cnblogs.com/Bonker/p/5619458.html)                   
 

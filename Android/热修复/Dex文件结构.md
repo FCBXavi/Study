@@ -141,3 +141,10 @@ type是一个枚举常量，可以通过类型名称来判断DexMapItem类型
     	kDexTypeEncodedArrayItem         = 0x5,
     	kDexTypeAnnotationsDirectoryItem = 0x6,
 	};	
+	
+	
+
+StringIdsOff区
+----------------------
+	
+Header中string\_ids_off指的是字符串索引的位置，在这个区域，每四个字节指的是真正存放字符串的地址，这个地址在data区，每一个索引指向的真正字符串的位置，使用了MUTF-8编码，头部存放了由uleb128编码字符的个数，后面是真正的字符串内容。
