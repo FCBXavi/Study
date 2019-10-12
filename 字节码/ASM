@@ -1,0 +1,69 @@
+
+Descriptor描述符 https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.3.2
+针对class字节码，方法描述符包括方法的参数和返回值
+
+Signatures特征签名
+方法的特征签名包括方法的返回值以及可能抛出的受检查异常
+
+栈帧 -> 局部变量表 操作数栈
+字节码指令 -> 操作码和固定参数
+
+字节码指令分为两类 一小部分用来在局部变量表和操作数栈之间传值，另一些指令仅用于操作数栈，从栈中弹出一些值，计算出结果后压回栈中
+ILOAD, LLOAD, FLOAD, DLOAD 和 ALOAD 用来读取一个局部变量压入操作数栈
+ISTORE, LSTORE, FSTORE, DSTORE 和 ASTORE 用来从操作数栈中弹出一个值，并将其存储在由其索引i制定的局部变量表中
+LDC cst 压入任意的int、float、long、double、String 或 class 常量 cst
+xADD、xSUB、xMUL、xDIV 和 xREM 对应于+、-、*、/和%运算，从操作数栈中弹出数值，合并它们，并将结果入栈
+GETFIELD owner name desc 弹出一个对象引用，并压和其 name 字段中的值。PUTFIELD owner name desc 弹出一个值和一个对象引用，并将这个值存储在它的 name 字段中
+GETSTATIC 和 PUTSTATIC 是类似指令，但用于静态字段
+
+INVOKEVIRTUAL owner name desc 调用在 类 owner 中定义的 name 方法，其方法 述符为 desc 
+INVOKESTATIC 用于静态方法， INVOKESPECIAL 用于私有方法和构造器，INVOKEINTERFACE 用于接口中定义的方法
+
+GE >=0
+GT >0
+LE <=0
+LT <0
+TRYCATCHBLOCK try catch catch 前两个参数是需要try的范围 起始标记和终止标记 第三个参数是处理器即catch的起始标记 try catch之前抛出异常，栈将被清空，异常压入这个栈中，然后执行catch处的代码
+
+
+栈映射帧 仅为那些对应于跳转目标或异常处理器的指令，或者跟在无条件跳转指令之后的指令包含帧
+跳转的label之后  GOTO或Throw的指令之后
+
+
+MethodVisitor访问方法
+首先visitCode()
+
+visitVarInsn(int opcode, int var) // load和store指令
+visitFieldInsn(int opcode, String owner, String name,String desc) // GETSTATIC, PUTSTATIC, GETFIELD or PUTFIELD指令
+visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) // INVOKEVIRTUAL, INVOKESPECIAL, INVOKESTATIC or INVOKEINTERFACE
+visitLabel(Label label)声明label所处的位置
+visitInsn(int opcode)
+
+最后visitMax(int, int) visitEnd()
+
+
+
+AdviceAdapter 是MethodVisitor 可以在一个方法的开头以及任意的RETURN或ATHROW指令前插入代码
+
+
+需要再了解，描述符和签名的不同之处
+
+源代码行编号与字节码指令的映射存储在一个(line number, lebel)对组成的列表，放在class中
+e.g. l1,l2,l3是三个label,(n1,l1)(n2,l2)(n3,l3)表示l1和l2之间的指令来自n1，l2和l3之间的指令来自n2，l3之后的指令来自n3。 一个行号可以出现在多个对中，这是因为，对于出现在一个源代码行中的表达式，其在字节代码中的相应指令可能不是连续的
+MethodVisitor类的visitLineNumber方法访问，每次访问一对
+
+源代码中局部变量名与字节码中局部变量槽之间的映射，以(name, type descriptor, type signature, start, end, index)等多元组列表的形式存储在该方法的已编译代码节中,表示在两个标记start和end之间，槽index中的局部变量对应于源代码中的局部变量,其名字和类型由多元组的前三个元素组成
+MethodVisitor类的visitLocalVariable方法访问，每次访问一个多元组。
+
+
+向后兼容
+1.ClassVisitor的子类以当前使用的ASM版本号为参数调用父类构造方法，不要重写或调用弃用的方法
+2.自己定义的visitor尽量不要被继承，而是使用委托，即访问器链。除非你能自己控制继承链，让子类是final的
+3.使用ASM版本的X的树编写类分析器或适配器，使用这一ASM版本为参数创建ClassNode
+
+
+树
+ClassNode 包含所有的class文件的内容 所有的visit方法只做存储，不进行真正的字节码操作。 调用accept(ClassVisitor cv)，对cv进行真正的visit序列处理
+MethodNode类似
+可以将树API仅用于方法，核心API用于类
+
