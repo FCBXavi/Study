@@ -26,6 +26,31 @@ B:onPause
 A:onNewIntent->onRestart->onStart->onResume      
 B:onStop->onDestroy      
   
+onCreate中finish        
+onCreate()->onDestroy()       
+
+onStart中finish       
+oncreate->onStart->onStop->onDestroy      
+
+onResume中finish  
+oncreate->onStart->onResume->onPause->onStop->onDestroy           
+
+onPause、onStop、onRestart中finish，生命周期执行顺序不变           
+
+	之所以是这样，源码中给出了解释，activity会判断状态，只有没有被finish才会执行下一个生命周期。
+	mInstrumentation.callActivityOnCreate(activity, r.state) // 函数中会判断：
+	if (!r.activity.mFinished) {
+		activity.performStart();
+		r.stopped = false;
+	}
+	/**执行完 onCreate()后，判断这时activity有没有finish，没有就会接着执行 onStart()，否则会调用destory()
+	执行完onStart()后会执行handleResumeActivity函数,其中performResumeActivity 函数中：*/
+	if (r != null && !r.activity.mFinished) {
+		r.activity.performResume();
+	}
+	/**会调用 onResume 如果此时finish，就不会执行finish()，
+	会调用ActivityManagerNative.getDefault().finishActivity(token, Activity.RESULT_CANCELED, null);执行销毁 */
+
  
 * 异常情况下的生命周期
 

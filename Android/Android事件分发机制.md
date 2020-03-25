@@ -23,7 +23,7 @@ onTouchEvent() 处理事件，返回true代表消费事件，事件停止传递�
 
 ###Touch事件的后续传递（MOVE，UP）
 dispatchTouchEvent消费事件(返回true)后，后续还能接收到其他事件		
-onTouch消费事件(返回true)后，后续的事件到达此View后不会再向下传递，直接交给该View的onTouchEvent方法并结束本次事件传递过程
+onTouchEvent消费事件(返回true)后，后续的事件到达此View后不会再向下传递，直接交给该View的onTouchEvent方法并结束本次事件传递过程
 
 onInterceptTouchEvent一旦返回一次true，就再也不会再被调用了
 如果ViewGroup拦截了一个半路的事件（如MOVE），这个事件将会被系统变成一个CANCEL事件传递给之前处理该事件的子VIEW，并不会直接传递给ViewGroup的onTouchEvent，只有后续再到来的事件才会传递给ViewGroup的onTouchEvent
@@ -31,7 +31,7 @@ onInterceptTouchEvent一旦返回一次true，就再也不会再被调用了
 
 
 
-###和onTouch和onClick
+###onTouch和onClick
 onTouch()的执行高于onClick()
 onTouch()返回true，会让View的dispatchTouchEvent方法直接返回true，不会调用onTouchEvent()，onClick也不会执行，onTouch如果返回false，就会在dispatchTouchEvent中执行onTouchEvent，如果注册了OnClickListener，就会在onTouchEvent中调用performClick，在里面回调onClick
 

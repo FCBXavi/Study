@@ -47,10 +47,12 @@ ActvityA是应用1的主Actvity，ActivityB和ActvityC属于应用2，B为主Act
 
 操作路径：A启动C-->点击Home键盘到Launcher->点击launcher上的应用2
 
-情况1.ActivityC的allowTaskReparenting属性为false，此时会进入ActvityB        典型案例：将文字文件等，分享到短信
+情况1.ActivityC的allowTaskReparenting属性为false，此时会进入ActvityB     
+典型案例：将文字文件等，分享到短信
 
 原因：当前任务栈1为AC，此时启动应用2，会启动任务栈2，然后将主ActivityB放入任务栈2中
 
-情况2：ActivityC的allowTaskReparenting属性为true，此时会进入ActvityC       典型案例：将文字文件等，分享到微信
+情况2：ActivityC的allowTaskReparenting属性为true，此时会进入ActvityC     
+典型案例：将文字文件等，分享到微信
 
 原因：当前任务栈1为AC，此时启动应用2，会启动任务栈2，然后系统发现C的taskAffinity属性任务栈2已经创建，就把C从任务栈1转移过来，这就是allowTaskReparenting的功能。

@@ -14,7 +14,7 @@ IntentService 处理异步请求
 步骤2：在Manifest.xml中注册服务   
 步骤3：在Activity中开启Service服务   
 
-本质是使用Handler&HanglerThread实现的  
+本质是使用Handler&HandlerThread实现的  
 通过HandlerThread单独开启一个名为IntentService的线程，创建一个名叫ServiceHandler的内部Handler   
 把内部Handler与HandlerThread所对应的子线程进行绑定  
 通过onStartCommand()传递给服务intent，依次插入到工作队列中，并逐个发送给onHandleIntent()  
