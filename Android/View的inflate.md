@@ -17,3 +17,14 @@ inflate过程，解析传入的resource文件，判断根节点是否是merge，
 
 viewGroup add view的时候，如果view被inflate的时候，root为null，那么view根布局的layout\_width和layout\height是失效的，在addView的时候会被默认指定成wrap\_content。
 一个view只有处于另外一个布局的包裹之下，它的layout\_width和layout\height才会生效。
+
+
+
+activity的setContentView(int layoutId)
+--------------------------------------
+
+	public void setContentView(@LayoutRes int layoutResID) {
+		// 调用了PhoneWindow的setContentView方法
+        getWindow().setContentView(layoutResID);
+        initWindowDecorActionBar();
+    }

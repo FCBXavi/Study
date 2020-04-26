@@ -215,6 +215,7 @@ AsyncCall
 	Response getResponseWithInterceptorChain() throws IOException {
     	// Build a full stack of interceptors.
     	List<Interceptor> interceptors = new ArrayList<>();
+    	// 这里注意一下，interceptors()的添加顺序在networkInterceptors()之前，中间有retryAndFollowUpInterceptor，这个拦截器是负责请求的重定向的，也就是说，如果有重定向情况发生，这个拦截器的不会返回response，会接着再次调用proceed方法，所以networkInterceptors中的intercept方法可能被调用多次（每次发生网络请求都会调用），而interceptors中的intercept方法只会被调用一次。
     	interceptors.addAll(client.interceptors());
     	interceptors.add(retryAndFollowUpInterceptor);
     	interceptors.add(new BridgeInterceptor(client.cookieJar()));
@@ -250,10 +251,12 @@ OkHttp的这种拦截器链采用的是责任链模式，这样的好处是将�
 	public final class RealInterceptorChain implements Interceptor.Chain {
 		public RealInterceptorChain(List<Interceptor> interceptors, StreamAllocation streamAllocation,
         	HttpCodec httpCodec, RealConnection connection, int index, Request request) {
+        	// 所有拦截器
         	this.interceptors = interceptors;
         	this.connection = connection;
         	this.streamAllocation = streamAllocation;
         	this.httpCodec = httpCodec;
+        	// 当前拦截器的下标
         	this.index = index;
         	this.request = request;
         }
@@ -273,6 +276,8 @@ OkHttp的这种拦截器链采用的是责任链模式，这样的好处是将�
     		RealInterceptorChain next = new RealInterceptorChain(
         		interceptors, streamAllocation, httpCodec, connection, index + 1, request);
     		//获取到当前拦截器，调用其intercept方法
+    		// e.g. 第一个获取的是我们自定义的Interceptor，如果没有的话，是RetryAndFollowUpInterceptor，重新new了一个RealInterceptorChain对象，把index + 1，然后调用RetryAndFollowUpInterceptor的intercept方法，把参数传进去，因此在RetryAndFollowUpInterceptor的intercept方法中，可以通过参数chain获取到最原始的request和call对象等，做一些自己的处理，然后调用proceed方法，把处理完的参数传入，获取Response对象，这时候又走到了RealInterceptorChain的proceed方法，然后获取到第二个拦截器，再执行上面的逻辑。这个方法会返回Response对象，直到最后一个Interceptor处理之前，大家都在等待这个对象。
+    		// Interceptor链的最后一个Interceptor是CallServerInterceptor，它真正执行了网络请求，获取到Response后，内部不再调用chain的proceed方法，直接返回网络请求的Response，然后倒数第二个Interceptor的proceed方法接收到返回值，进行相应的处理，然后返回，倒数第三个Interceptor接收到处理...层层向上，直到最后第一个Interceptor接收到数据处理完返回，这时候RealCall的getResponseWithInterceptorChain拿到最终的返回值，网络请求完毕。
     		Interceptor interceptor = interceptors.get(index);
     		Response response = interceptor.intercept(next);
     			......

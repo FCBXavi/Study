@@ -17,7 +17,7 @@ dispatchTouchEvent() 当事件传递给当前View时会被调用，返回true代
 
 onInterceptTouchEvent() ViewGroup特有，表示是否拦截事件，返回false表示不拦截，事件交由下层的View的dispatchTouchEvent处理，<font color=red>当前View还会接收到此次事件序列的其他事件</font>，返回true表示拦截，交由本层的onTouchEvent处理。
 
-onTouchEvent() 处理事件，返回true代表消费事件，事件停止传递，返回false代表不消费事件，事件继续传递给上层的onTouchEvent处理，<font color=red>当前View不会接收到此次事件序列的其他事件</font>。
+onTouchEvent() 处理事件，返回true代表消费事件，事件停止传递，返回false代表不消费事件，事件继续传递给上层的onTouchEvent处理，<font color=red>如果再down事件中返回false，当前View不会接收到此次事件序列的其他事件</font>。
 
 
 

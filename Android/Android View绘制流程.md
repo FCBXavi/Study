@@ -12,9 +12,8 @@ Mode共有三种形式
 >AT_MOST：子容器可以是声明大小内的任意大小
 
 measure过程：	
-<!--父View的MeasureSpec传递给子View，结合子View的LayoutParams 一起再算出子View的MeasureSpec，然后继续传给子View，不断计算每个View的MeasureSpec，子View有了MeasureSpec才能更测量自己和自己的子View。     -->
     
-ViewGroup有一个measureChildren方法，测量子view的大小，根据自己的measureSpec，padding，子View的LayoutParams，计算出子视图的measureSpec，调用子视图的measure方法，把该值传入
+ViewGroup有一个measureChildren方法，测量子view的大小，根据父View传给自己的measureSpec，padding，子View的LayoutParams，计算出子视图的measureSpec，调用子视图的measure方法，把该值传入
 
 1. 父View的MeasureSpec是EXACTLY		
  * 子View的layout\_xxx是match\_parent，size是父View的size，mode是EXACTLY
@@ -57,3 +56,6 @@ ViewGroup有一个measureChildren方法，测量子view的大小，根据自己�
 
 
 invalidate重新绘制，只能在主线程调用，postInvalidate可以在子线程调用，当View的大小形状或者位置发生改变时，调用requestLayout。
+
+
+onMeasure和onLayout可能会执行多次

@@ -18,11 +18,15 @@ Activity启动模式
 可在intent中通过setFlag设置即将启动的Activity的模式，优先级高于AndroidManifest.xml文件中定义的启动模式。
 
  * FLAG\_ACTIVITY\_NEW\_TASK	   
- 与singleTask相同
+ 目标Activity和启动Activity的taskAffinity相同，该属性不起作用       
+ 目标Activity和启动Activity的taskAffinity不同，会在目标栈中查看是否有该Activity的实例，如果有，无法启动，如果没有，才会启动并压入栈中
  * FLAG\_AVTIVITY\_SINGLE\_TOP    
  与singleTop相同
  * FLAG\_ACTIVITY\_CLEAR\_TOP    
- 如果启动的Activity在栈中已经存在，则会把栈中所有该Activity之上的其他Activity移除，如果没有设置FLAG\_AVTIVITY\_SINGLE\_TOP且启动的Activity的模式是standard，该Activity也会被移除，然后创建一个新的实例，否则会调用其onNewIntent方法。(只判断启动该Activity的Activity所在task)
+ 如果启动的Activity在栈中已经存在，则会把栈中所有该Activity之上的其他Activity移除，如果没有设置FLAG\_AVTIVITY\_SINGLE\_TOP且启动的Activity的模式是standard，该Activity也会被移除，然后创建一个新的实例，否则会调用其onNewIntent方法。(只判断启动该Activity的Activity所在task)    
+ * FLAG\_ACTIVITY\_CLEAR\_TASK       
+  目标Activity和启动Activity的taskAffinity相同，该属性不起作用    
+  目标Activity和启动Activity的taskAffinity不同，和FLAG\_ACTIVITY\_NEW\_TASK一起使用，如果启动的Activity不在栈中，直接启动，如果已经在栈中，会把当前栈中的所有Activity先移除掉，然后将该Activity放入新的栈中
 
 
 
